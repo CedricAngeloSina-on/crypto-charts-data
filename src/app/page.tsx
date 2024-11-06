@@ -4,10 +4,15 @@ import {
   CardDescription,
   CardHeader,
 } from "~/components/ui/card";
+import { CryptoChart } from "~/components/crypto-chart";
 import { CryptoCombobox } from "~/components/crypto-combobox";
 import { ThemeTrigger } from "~/components/theme-switcher";
 
+import { api } from "~/trpc/server";
+
 export default async function Home() {
+  const cryptoData = await api.crypto.getData({ ticker: "BTC/USD" });
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-4">
       <div className="absolute left-4 top-4">
@@ -26,6 +31,7 @@ export default async function Home() {
         <CardContent className="w-full px-2 sm:p-6">
           <div className="flex aspect-auto h-[400px] w-full flex-col items-center justify-center">
             {/* CHART COMPONENT */}
+            <CryptoChart cryptoData={cryptoData} />
           </div>
         </CardContent>
       </Card>
