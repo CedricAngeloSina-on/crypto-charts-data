@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { type CryptoData } from "~/lib/types";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import {
   type ChartConfig,
@@ -9,6 +8,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "~/components/ui/chart";
+
+import { api } from "~/trpc/react";
+import { useCryptoTickerStore } from "~/store/crypto-ticker-store";
 
 const chartConfig = {
   close: {
@@ -26,36 +28,47 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function CryptoChart({ cryptoData }: { cryptoData: CryptoData }) {
+export function CryptoChart() {
+  const { cryptoTicker } = useCryptoTickerStore();
+  const [cryptoData] = api.crypto.getData.useSuspenseQuery({
+    ticker: cryptoTicker,
+  });
+
   const formattedData = useMemo(
     () =>
-      cryptoData.t.map((time, index) => ({
-        open: cryptoData.o[index]!,
-        high: cryptoData.h[index]!,
-        low: cryptoData.l[index]!,
-        close: cryptoData.c[index]!,
-        volume: cryptoData.v[index]!,
+      cryptoData?.t.map((time, index) => ({
+        open: cryptoData?.o[index],
+        high: cryptoData?.h[index],
+        low: cryptoData?.l[index],
+        close: cryptoData?.c[index],
+        volume: cryptoData?.v[index],
         date: new Date(time * 1000).toISOString(),
       })),
     [cryptoData],
   );
 
-  const minValue = useMemo(
-    () =>
-      Math.min(...formattedData.map((item) => Math.min(item.open, item.close))),
-    [formattedData],
-  );
-  const maxValue = useMemo(
-    () =>
-      Math.max(...formattedData.map((item) => Math.max(item.open, item.close))),
-    [formattedData],
-  );
+  const minValue = useMemo(() => {
+    if (!formattedData) return 0; // Return 0 if formattedData is undefined
 
+    return Math.min(
+      ...formattedData.map((item) => Math.min(item.open ?? 0, item.close ?? 0)),
+    );
+  }, [formattedData]);
+
+  const maxValue = useMemo(() => {
+    if (!formattedData) return 0; // Return 0 if formattedData is undefined
+
+    return Math.max(
+      ...formattedData.map((item) => Math.min(item.open ?? 0, item.close ?? 0)),
+    );
+  }, [formattedData]);
   const percentageChange = useMemo(() => {
-    if (formattedData.length === 0) return 0;
+    if (!formattedData || formattedData.length === 0) return 0;
 
-    const firstValue = formattedData[0]!.close;
-    const lastValue = formattedData.at(-1)?.close ?? 0;
+    const firstValue = formattedData[0]?.close ?? 0;
+    const lastValue = formattedData[formattedData.length - 1]?.close ?? 0;
+
+    if (firstValue === 0) return 0; // Avoid division by zero
 
     return ((lastValue - firstValue) / firstValue) * 100;
   }, [formattedData]);

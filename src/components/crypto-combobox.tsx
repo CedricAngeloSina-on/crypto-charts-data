@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "~/lib/utils";
@@ -18,6 +18,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
+
+import { useCryptoTickerStore } from "~/store/crypto-ticker-store";
 
 const coins = [
   {
@@ -64,11 +66,8 @@ const coins = [
 
 export function CryptoCombobox() {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(coins[0]?.value);
 
-  useEffect(() => {
-    console.log(`Selected coin value: ${value}`);
-  }, [value]);
+  const { cryptoTicker, setCryptoTicker } = useCryptoTickerStore();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -79,7 +78,8 @@ export function CryptoCombobox() {
           aria-expanded={open}
           className="w-[230px] justify-between text-2xl font-semibold"
         >
-          {coins.find((coin) => coin.value === value)?.label ?? value}
+          {coins.find((coin) => coin.value === cryptoTicker)?.label ??
+            cryptoTicker}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -94,7 +94,7 @@ export function CryptoCombobox() {
                   key={coin.value}
                   value={coin.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue);
+                    setCryptoTicker(currentValue);
                     setOpen(false);
                   }}
                 >
@@ -102,7 +102,7 @@ export function CryptoCombobox() {
                   <Check
                     className={cn(
                       "ml-auto",
-                      value === coin.value ? "opacity-100" : "opacity-0",
+                      cryptoTicker === coin.value ? "opacity-100" : "opacity-0",
                     )}
                   />
                 </CommandItem>
