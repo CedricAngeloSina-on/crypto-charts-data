@@ -1,4 +1,10 @@
-import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "~/components/ui/card";
+import { CryptoCombobox } from "~/components/crypto-combobox";
 import { ThemeTrigger } from "~/components/theme-switcher";
 
 export default async function Home() {
@@ -10,7 +16,11 @@ export default async function Home() {
       <Card className="w-full max-w-screen-lg">
         <CardHeader className="flex flex-row items-start justify-between space-y-0 px-4 py-5 sm:py-6 md:px-6">
           <div className="flex flex-1 flex-col justify-center gap-1">
-            {/* CRPYTO SELECTOR */}
+            <CryptoCombobox />
+            <CardDescription className="pl-1">
+              {/* TICKER SYMBOL */}
+              price in the last 30 days
+            </CardDescription>
           </div>
         </CardHeader>
         <CardContent className="w-full px-2 sm:p-6">
