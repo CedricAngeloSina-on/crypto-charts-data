@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import {
   Card,
   CardContent,
@@ -7,6 +8,7 @@ import {
 import { CryptoChart } from "~/components/crypto-chart";
 import { CryptoCombobox } from "~/components/crypto-combobox";
 import { CryptoTcikerSymbol } from "~/components/crypto-ticker-symbol";
+import { Skeleton } from "~/components/ui/skeleton";
 import { ThemeTrigger } from "~/components/theme-switcher";
 
 import { api, HydrateClient } from "~/trpc/server";
@@ -31,7 +33,11 @@ export default async function Home() {
           </CardHeader>
           <CardContent className="w-full px-2 sm:p-6">
             <div className="flex aspect-auto h-[400px] w-full flex-col items-center justify-center">
-              <CryptoChart />
+              <Suspense
+                fallback={<Skeleton className="aspect-auto h-[400px] w-full" />}
+              >
+                <CryptoChart />
+              </Suspense>
             </div>
           </CardContent>
         </Card>
