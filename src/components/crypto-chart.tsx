@@ -9,8 +9,7 @@ import {
   ChartTooltipContent,
 } from "~/components/ui/chart";
 
-import { api } from "~/trpc/react";
-import { useCryptoTickerStore } from "~/store/crypto-ticker-store";
+import { type CryptoData } from "~/lib/types";
 
 const chartConfig = {
   close: {
@@ -28,12 +27,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function CryptoChart() {
-  const { cryptoTicker } = useCryptoTickerStore();
-  const [cryptoData] = api.crypto.getData.useSuspenseQuery({
-    ticker: cryptoTicker,
-  });
-
+export function CryptoChart({ cryptoData }: { cryptoData: CryptoData }) {
   const formattedData = useMemo(
     () =>
       cryptoData?.t.map((time, index) => ({

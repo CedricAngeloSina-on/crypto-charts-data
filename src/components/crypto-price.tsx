@@ -4,15 +4,9 @@ import { useMemo } from "react";
 import { Triangle } from "lucide-react";
 
 import { cn } from "~/lib/utils";
-import { api } from "~/trpc/react";
-import { useCryptoTickerStore } from "~/store/crypto-ticker-store";
+import { type CryptoData } from "~/lib/types";
 
-export function CryptoPrice() {
-  const { cryptoTicker } = useCryptoTickerStore();
-  const [cryptoData] = api.crypto.getData.useSuspenseQuery({
-    ticker: cryptoTicker,
-  });
-
+export function CryptoPrice({ cryptoData }: { cryptoData: CryptoData }) {
   const percentageChange = useMemo(() => {
     const firstValue = cryptoData.c[0] ?? 0;
     const lastValue = cryptoData.c.at(-1) ?? 0;
